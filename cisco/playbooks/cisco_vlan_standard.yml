@@ -1,0 +1,25 @@
+---
+- name: "Standardize VLANs across Access Switches"
+  hosts: access_switches
+  gather_facts: no
+
+  tasks:
+    - name: "Ensure Core VLANs exist"
+      cisco.ios.ios_vlans:
+        config:
+          - name: MGMT_VLAN
+            vlan_id: 10
+          - name: CUSTOMERS_FTTH
+            vlan_id: 100
+          - name: IPTV_VOIP
+            vlan_id: 200
+        state: merged
+
+    - name: "Configure Trunking on Uplink Port"
+      cisco.ios.ios_l2_interfaces:
+        config:
+          - name: GigabitEthernet0/1
+            trunk:
+              allowed_vlans: 10,100,200
+              native_vlan: 1
+        state: merged
