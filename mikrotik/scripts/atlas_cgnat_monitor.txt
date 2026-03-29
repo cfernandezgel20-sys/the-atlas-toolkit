@@ -1,0 +1,17 @@
+# --------------------------------------------------------------------------
+# Script: Atlas CGNAT Monitoring
+# Description: Monitors the total connection count to prevent pool exhaustion.
+# --------------------------------------------------------------------------
+
+:local connLimit 40000; # Adjust based on your hardware capacity
+:local currentConns [/ip firewall connection count];
+
+:if ($currentConns > $connLimit) do={
+    :local msg "CRITICAL: CGNAT Connections at $currentConns on $[/system identity get name]";
+    :log error $msg;
+    
+    # Send alert via Telegram or Email
+    # /tool fetch url="https://api.telegram.org/botXXX/sendMessage?chat_id=YYY&text=$msg" keep-result=no
+} else={
+    :log info "CGNAT Health Check: $currentConns connections. Operating within limits.";
+}
