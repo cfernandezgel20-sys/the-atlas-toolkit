@@ -1,0 +1,27 @@
+# --------------------------------------------------------------------------
+# Template: Huawei S-Series Core L3 & OSPF
+# Description: VLAN Interface configuration and OSPF Dynamic Routing.
+# --------------------------------------------------------------------------
+
+# VLAN & Interface L3
+vlan 100
+ description UPLINK_TO_BORDER
+#
+interface Vlanif100
+ description ATLAS_BACKBONE
+ ip address 172.16.0.2 255.255.255.252
+#
+
+# OSPF Configuration
+ospf 1 router-id 1.1.1.1
+ area 0.0.0.0
+  network 172.16.0.0 0.0.0.3
+  network 192.168.100.0 0.0.0.255
+#
+
+# Optimization: MTU for Carrier traffic
+interface GigabitEthernet0/0/1
+ mtu 9000
+ description TRUNK_TO_OLT
+ port link-type trunk
+ port trunk allow-pass vlan 100
