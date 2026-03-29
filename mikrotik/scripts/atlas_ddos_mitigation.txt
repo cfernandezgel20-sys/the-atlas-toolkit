@@ -1,0 +1,15 @@
+# --------------------------------------------------------------------------
+# Script: Atlas Dynamic Threat Mitigation
+# Description: Automates the blocking of high-frequency connection attempts.
+# --------------------------------------------------------------------------
+
+/ip firewall filter
+add action=add-src-to-address-list address-list=Attackers address-list-timeout=1d \
+    chain=input comment="Atlas: Detect SSH/Winbox Brute Force" connection-state=new \
+    dst-port=22,8291 protocol=tcp src-address-list=!Trusted_IPs limit=5,10:packet
+
+/ip firewall raw
+add action=drop chain=prerouting comment="Atlas: Drop known attackers at RAW level (CPU Efficient)" \
+    src-address-list=Attackers
+
+:log warning "Atlas Mitigation: RAW Drop rules active for dynamic attackers list.";
