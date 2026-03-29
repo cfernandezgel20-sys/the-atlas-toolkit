@@ -1,0 +1,23 @@
+# --------------------------------------------------------------------------
+# Template: GPON Service Profiles (Standard 1Gbps)
+# Description: DBA, Line, and Service profiles for high-speed FTTH.
+# --------------------------------------------------------------------------
+
+# DBA Profile (Bandwidth allocation)
+dba-profile add profile-id 20 profile-name "ATLAS_GIGABIT" type4 max 1024000
+
+# ONT Line Profile
+ont-line-profile gpon profile-id 20 profile-name "ATLAS_LINE_PF"
+ tcont 1 dba-profile-id 20
+ gem add 1 eth tcont 1
+ gem mapping 1 0 vlan 100
+commit
+
+# ONT Service Profile
+ont-srv-profile gpon profile-id 20 profile-name "ATLAS_SRV_PF"
+ ont-port eth 4 pots 1 catv 1
+ port vlan eth 1 translation 100 user-vlan 100
+commit
+
+# Service Port (The actual flow)
+# service-port 100 vlan 1000 gpon 0/1/0 ont 1 gemport 1 multi-service user-vlan 100 tag-transform translate
