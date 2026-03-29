@@ -1,0 +1,19 @@
+---
+- name: "Cisco BGP Border Router Configuration"
+  hosts: border_routers
+  gather_facts: no
+
+  tasks:
+    - name: "Configure BGP Neighbors and Prefix-Lists"
+      cisco.ios.ios_config:
+        lines:
+          - ip prefix-list PL-OUT-MY-ASN seq 5 permit 203.0.113.0/24
+          - router bgp 65001
+          - bgp log-neighbor-changes
+          - neighbor 1.2.3.4 remote-as 1234
+          - neighbor 1.2.3.4 description UPLINK-PROVIDER-A
+          - address-family ipv4
+          - network 203.0.113.0 mask 255.255.255.0
+          - neighbor 1.2.3.4 activate
+          - neighbor 1.2.3.4 prefix-list PL-OUT-MY-ASN out
+        save_when: always
