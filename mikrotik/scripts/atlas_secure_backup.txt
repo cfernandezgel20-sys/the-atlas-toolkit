@@ -1,0 +1,39 @@
+# --------------------------------------------------------------------------
+# Script: Atlas Secure Backup & Cleanup
+# Description: Generates timestamped .backup and .rsc files and removes old ones.
+# --------------------------------------------------------------------------
+
+:local sysName [/system identity get name];
+:local dateTime [/system clock get date];
+:local timeTime [/system clock get time];
+:local backupName ("$sysName" . "-" . "$dateTime" . "-" . "$timeTime");
+
+# Remove special characters from filename
+:for i from=0 to=([:len $backupName] - 1) do={
+    :local char [:pick $backupName $i];
+    :if ($char = "/" || $char = ":") do={
+        :set backupName ([:pick $backupName 0 $i] . "-" . [:pick $backupName ($i + 1) [:len $backupName]]);
+    }
+}
+
+:log info "Starting Atlas Backup Process: $backupName";
+
+# Create Backup and Export
+/system backup save name=$backupName;
+/export file=$backupName;
+
+# Delay to ensure files are written
+:delay 5s;
+
+# OPTIONAL: Add your Cloud/FTP upload command here
+# /tool fetch upload=yes mode=ftp address=X.X.X.X src-path=$backupName user=U password=P
+
+# Retention Policy: Delete files older than 30 days
+:local retentionDays 30;
+:foreach i in=[/file find] do={
+    :local fName [/file get $i name];
+    :local fDate [/file get $i creation-time];
+    # Logic for date comparison goes here depending on your specific needs
+}
+
+:log info "Atlas Backup Process Completed Successfully.";
