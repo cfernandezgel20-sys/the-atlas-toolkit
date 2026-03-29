@@ -1,0 +1,27 @@
+# --------------------------------------------------------------------------
+# Template: Huawei OLT Secure Management (VRP)
+# Description: Disables insecure protocols and sets up SSH/ACL for management.
+# --------------------------------------------------------------------------
+
+# Disable insecure services
+undo telnet server enable
+undo http server enable
+
+# Configure SSH Access
+sysman server source ssh any-interface
+ssh user admin authentication-type password
+ssh user admin service-type stelnet
+
+# Management ACL (Only allow NOC subnet)
+acl 2000
+ rule 5 permit source 10.10.10.0 0.0.0.255
+ rule 10 deny any
+#
+user-interface vty 0 4
+ acl 2000 inbound
+ authentication-mode aaa
+ protocol inbound ssh
+#
+
+# System Identity
+sysname ATLAS-CORE-OLT-01
